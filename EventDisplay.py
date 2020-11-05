@@ -333,7 +333,6 @@ EventDisplayHist(digitimes, "Time", [940, 1100])
 
 # Add a 2d histogram of charge versus time
 
-
 # In[26]:
 
 
@@ -1067,3 +1066,27 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
 GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2)
 
 
+def truecharge():
+    blob.net.eval()  # eval mode
+    for i, data in enumerate(blob.train_loader):
+        blob.data, blob.label = data[0:2]
+        res = forward(blob, train=False)
+        break
+
+
+
+    for idx in np.arange(10):
+        print(idx)
+        fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(16, 8), facecolor='w')
+        charg = blob.data[idx, :, :, 0]
+        pred = res['prediction'][idx, :, :]
+        pred = np.where(charg > 0., pred, 0.)
+        ax1.imshow(charg)
+        ax2.imshow(blob.label[idx, :, :])
+        ax3.imshow(pred)
+        ax1.set_title('True charge')
+        ax2.set_title('True label')
+        ax3.set_title('Pred label')
+        plt.show()
+
+    print(res['prediction'].shape)
