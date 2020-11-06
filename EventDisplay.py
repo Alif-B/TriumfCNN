@@ -13,8 +13,8 @@ import math
 import random
 
 # In[2]:
-datafile = np.load('event998.npz', allow_pickle=True)
-geofile = np.load('mpmt_full_geo.npz', allow_pickle=True)
+datafile = np.load('NonPyFiles/event998.npz', allow_pickle=True)
+geofile = np.load('NonPyFiles/mpmt_full_geo.npz', allow_pickle=True)
 # # First let's explore the geometry file
 # Make sure we can find the phototube locations, and build a mapping from the three dimensional locations of the PMTs.
 
@@ -606,8 +606,8 @@ import matplotlib.pyplot as plt
 fig = plt.figure(figsize=[10, 8])
 ax = fig.add_subplot(111, projection='3d')
 
-f = np.load("event998.npz", allow_pickle=True)
-g = np.load("mpmt_full_geo.npz")
+f = np.load("NonPyFiles/event998.npz", allow_pickle=True)
+g = np.load("NonPyFiles/mpmt_full_geo.npz")
 truehit_pmts = f['true_hit_pmt'][1]
 truehit_positions = g['position'][truehit_pmts]
 

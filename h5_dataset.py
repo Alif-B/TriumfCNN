@@ -44,7 +44,7 @@ class H5Dataset(Dataset, ABC):
         # Create attribute so that method won't be invoked again
         self.h5_file = h5_file
 
-    # @abstractmethod
+    @abstractmethod
     def get_data(self, hit_pmts, hit_charges, hit_times):
         pass
 

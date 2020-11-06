@@ -1,8 +1,8 @@
 import numpy as np
 import json
 
-npz_file = "event998.npz"
-JSON_file = "npz.JSON"
+npz_file = "NonPyFiles/event998.npz"
+JSON_file = "NonPyFiles/npz.JSON"
 data = np.load(npz_file, allow_pickle=True)
 file = open(JSON_file, 'w')
 
