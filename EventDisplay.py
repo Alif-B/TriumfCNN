@@ -201,6 +201,8 @@ digitubes, digicharges, digitimes = GetEvent(evno)
 
 
 number_of_events = len(datafile['digi_hit_pmt'])
+print("test")
+print(number_of_events)
 number_of_events
 
 # In[15]:
@@ -310,7 +312,6 @@ def EventDisplayHist(quantities, title="Charge", cutrange=[-1, -1]):
     # fig.suptitle(title, fontsize=20)
     plt.xlabel(title, fontsize=18)
     plt.ylabel('Count / bin', fontsize=16)
-
 
 EventDisplayHist(digicharges, "Charge")
 
@@ -1015,7 +1016,7 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
             x_data[i - delay, rows, cols, pmt_channels + 19] = time
 
             # fix below!!!
-            idx0 = indices[0]
+            idx0 = indices[-1]
             event_id = np.append(event_id, data['event_id'][idx0])
             root_file = np.append(root_file, data['root_file'][idx0])
             pid = np.append(pid, data['pid'][idx0])
