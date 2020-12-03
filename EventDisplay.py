@@ -13,6 +13,7 @@ import math
 import random
 import os
 import sys
+from memory_profiler import profile
 
 
 # In[2]:
@@ -916,7 +917,7 @@ def GenMapping(csv_file):
         npmap[k] = v
     return npmap
 
-
+@profile
 def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
     """
     Inputs: 
