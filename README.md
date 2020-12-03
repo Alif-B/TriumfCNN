@@ -17,3 +17,6 @@ percall
     cumtime divided by primitive calls
 
 Profile funciton is tied to pr variable, which is used to start and stop profiler capture to specify which function to capture, in this case, is GenerateMultiMuonSample_h5. After the capture, the output is saved as test.txt, which can be used to see which code is causing the delay
+
+To run profiler outside of the python file, simply run the profile.bat with the file you wish to run the profiler with, like so:
+profile.bat GenerateMultiMuonSample.py
