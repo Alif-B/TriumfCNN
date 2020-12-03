@@ -105,7 +105,7 @@ def count_events(files):
         data = np.load(f, allow_pickle=True)
         nonzero_file_events.append([])
         hits = data['digi_hit_pmt']
-        for i in range(len(hits) -2990):
+        for i in range(len(hits)):
             if len(hits[i]) != 0:
                 nonzero_file_events[file_index].append(i)
                 num_events += 1
