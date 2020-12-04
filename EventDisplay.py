@@ -5,16 +5,16 @@
 # Authors: Blair Jamieson, Connor Boubard
 # June 2020
 
-# In[138]:
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 import math
 import random
 
+import matplotlib.pyplot as plt
+# In[138]:
+import numpy as np
+
 # In[2]:
-datafile = np.load('NonPyFiles/event998.npz', allow_pickle=True)
-geofile = np.load('NonPyFiles/mpmt_full_geo.npz', allow_pickle=True)
+datafile = np.load('Event26.npz', allow_pickle=True)
+geofile = np.load('mpmt_full_geo.npz', allow_pickle=True)
 # # First let's explore the geometry file
 # Make sure we can find the phototube locations, and build a mapping from the three dimensional locations of the PMTs.
 
@@ -600,14 +600,13 @@ plt.show()
 
 
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 fig = plt.figure(figsize=[10, 8])
 ax = fig.add_subplot(111, projection='3d')
 
-f = np.load("NonPyFiles/event998.npz", allow_pickle=True)
-g = np.load("NonPyFiles/mpmt_full_geo.npz")
+f = np.load("event26.npz", allow_pickle=True)
+g = np.load("mpmt_full_geo.npz")
 truehit_pmts = f['true_hit_pmt'][1]
 truehit_positions = g['position'][truehit_pmts]
 
@@ -868,7 +867,6 @@ datafile['position'][0]
 # In[136]:
 
 
-import os
 import h5py
 import numpy as np
 
@@ -881,6 +879,7 @@ def count_events(files):
     # we need to count the events beforehand (to create the h5 file).
     # This function counts and indexes the events with more than 0 hits.
     # Files need to be iterated in the same order to use the indexes.
+    # We have reduced the amount of hits for the sake of troubleshooting of working with smaller npz file
     """ This is where we manually specify the file"""
     num_events = 0
     nonzero_file_events = []
@@ -888,7 +887,8 @@ def count_events(files):
         data = np.load(f, allow_pickle=True)
         nonzero_file_events.append([])
         hits = data['digi_hit_pmt']
-        for i in range(len(hits)):
+        #This line reduces the events in the npz file by taking  a set amount of values
+        for i in range(len(hits) -2990):
             if len(hits[i]) != 0:
                 nonzero_file_events[file_index].append(i)
                 num_events += 1
@@ -920,7 +920,7 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
      avg_mu_per_ev == Poisson distribution mean for number of muons in each spill
      sigma_time_offset == Width of spill (Gaussian) in nanoseconds
     """
-    files = ['event998.npz']
+    files = ['event26.npz']
 
     # Remove whitespace 
     files = [x.strip() for x in files]
@@ -931,13 +931,15 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
     print("Merging " + str(len(files)) + " files")
 
     # Start merging
+
     num_nonzero_events, nonzero_event_indexes = count_events(files)
     print(num_nonzero_events)
 
     # np.random.poisson( avg_mu_per_ev, number_of_throws )
     num_muons = np.random.poisson(avg_mu_per_ev, num_nonzero_events)
 
-    #
+    #creates h5 file to generate the h5 file
+
 
     dtype_events = np.dtype(np.float32)
     dtype_labels = np.dtype(np.int32)
@@ -946,7 +948,8 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
     dtype_IDX = np.dtype(np.int32)
     dtype_PATHS = h5py.special_dtype(vlen=str)
     dtype_angles = np.dtype(np.float32)
-    h5_file = h5py.File('multimuonfile.h5', 'w')
+    #sets h5 file to be written
+    h5_file = h5py.File('multimuonfile(2).h5', 'w')
     dset_event_data = h5_file.create_dataset("event_data",
                                              shape=(num_nonzero_events,) + IMAGE_SHAPE,
                                              dtype=dtype_events)
@@ -1000,7 +1003,13 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
         energy = np.array([])
         labels = np.array([])
 
+        #with open("ResultFile.txt", "w") as text_file:
+        #sys.stdout = open("Result2.txt", "w")
+
+
         for i, nmu in enumerate(num_muons):
+            #np.savetxt(text_file, i, nmu,fmt="%d")
+            #text_file.write("processing output entry " + str(i) + " with " + nmu + " muons")
             print("processing output entry ", i, " with ", nmu, " muons")
             indices = np.random.randint(0, len(digi_hit_pmt), max(1, nmu))
             time_offs = [0.]
@@ -1014,37 +1023,55 @@ def GenerateMultiMuonSample_h5(avg_mu_per_ev=2.5, sigma_time_offset=21.2):
             x_data[i - delay, rows, cols, pmt_channels] = charge
             x_data[i - delay, rows, cols, pmt_channels + 19] = time
 
-            # fix below!!!
+            #
             idx0 = indices[0]
             event_id = np.append(event_id, data['event_id'][idx0])
             root_file = np.append(root_file, data['root_file'][idx0])
             pid = np.append(pid, data['pid'][idx0])
             position = np.append(position, data['position'][idx0])
+            #print(position)
             direction = np.append(direction, data['direction'][idx0])
             energy = np.append(energy, np.sum(data['energy'][indices]))
             labels = np.append(labels, nmu)
 
+
         offset_next += nonzero_events_in_file
 
-        file_indices = nonzero_event_indexes[file_index]
 
+        file_indices = nonzero_event_indexes[file_index]
+        # print(file_indices)
+        # x = dset_IDX[offset:offset_next]
+        # y = event_id[file_indices]
         dset_IDX[offset:offset_next] = event_id[file_indices]
         dset_PATHS[offset:offset_next] = root_file[file_indices]
         dset_energies[offset:offset_next, :] = energy[file_indices].reshape(-1, 1)
-        dset_positions[offset:offset_next, :, :] = position[file_indices].reshape(-1, 1, 3)
+        # print(dset_energies)
+
+        # refactor dset_positions to take in 3 positions for each event in a 3D matrix
+        dset_positions[offset:offset_next, :, :] = position[file_indices].reshape(-1, 1, 1)
+        # print(dset_positions)
+        # print(dset_labels)
         dset_labels[offset:offset_next] = labels[file_indices]
 
         direction = direction[file_indices]
-        polar = np.arccos(direction[:, 1])
-        azimuth = np.arctan2(direction[:, 2], direction[:, 0])
+        print(direction)
+        print(type(direction))
+
+        # edited line 1060 to take in a list from the directions as it is a 1D value, essentially a mathematical equation
+        # called np.arccos is transforming the value of the direction
+        polar = np.arccos(direction[:])
+        azimuth = np.arctan2(direction[:], direction[:])
         dset_angles[offset:offset_next, :] = np.hstack((polar.reshape(-1, 1), azimuth.reshape(-1, 1)))
         dset_event_data[offset:offset_next, :] = x_data
 
         offset = offset_next
+        print(offset)
         print("Finished file: {}".format(filename))
 
+
+    #sys.stdout.close()
     print("Saving")
-    h5_file.close()
+    #h5_file.close()
     print("Finished")
 
 
