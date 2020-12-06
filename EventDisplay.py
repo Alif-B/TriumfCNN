@@ -14,7 +14,7 @@ import numpy as np
 
 # In[2]:
 datafile = np.load('Event26.npz', allow_pickle=True)
-geofile = np.load('mpmt_full_geo.npz', allow_pickle=True)
+geofile = np.load('./Input Files/mpmt_full_geo.npz', allow_pickle=True)
 # # First let's explore the geometry file
 # Make sure we can find the phototube locations, and build a mapping from the three dimensional locations of the PMTs.
 
